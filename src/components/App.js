@@ -1,10 +1,11 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import AlphabetNavigation from '../components/AlphabetNavigation';
-import Filter from '../components/Filter';
-import Pagination from '../components/Pagination';
-import Error from '../components/Error';
+import AlphabetNavigation from './AlphabetNavigation';
+import Filter from './Filter';
+import Pagination from './Pagination';
+import Error from './Error';
+import Movies from './Movies';
 
 class App extends Component {
   static propTypes = {
@@ -24,46 +25,42 @@ class App extends Component {
       return <Error error={this.props.error} />;
     }
 
-    const movieItems = movies.map(movie => {
-      return <li key={movie.name}>{movie.name}</li>;
-    });
-
     return (
       <div className='container'>
         <h1>Movies</h1>
-        <p>Movie count: {movies.length}</p>
+        <AlphabetNavigation dispatch={dispatch}
+                            letter={letter}></AlphabetNavigation>
         <Filter dispatch={dispatch}
                 value={filterText}></Filter>
         <Pagination dispatch={dispatch}
                     pageNumber={pageNumber}
                     pageCount={pageCount}
                     itemCount={movies.length}></Pagination>
-        <AlphabetNavigation dispatch={dispatch}
-                            letter={letter}></AlphabetNavigation>
+
         <p>Displaying {movies.length} of {movieCount} movies.</p>
-        <ul>{movieItems}</ul>
+        <Movies dispatch={dispatch} movies={movies} />
       </div>
     );
   }
 }
 
-const matchesFilter = (filterText, name) => {
+const matchesFilter = (filterText, title) => {
   if(filterText) {
-    return Boolean(name.match(new RegExp(filterText, 'i')));
+    return Boolean(title.match(new RegExp(filterText, 'i')));
   }
   return true;
 };
 
-const matchesLetter = (letter, name) => {
-  return name.toUpperCase().startsWith(letter);
+const matchesLetter = (letter, title) => {
+  return title.toUpperCase().startsWith(letter);
 };
 
 const mapStateToProps = state => {
   const pageSize = 5,
         {movies, pageNumber, letter, filterText} = state,
         filteredMovies = movies.filter(movie => {
-          return matchesFilter(filterText, movie.name) &&
-            matchesLetter(letter, movie.name);
+          return matchesFilter(filterText, movie.title) &&
+            matchesLetter(letter, movie.title);
         }),
         pageCount = Math.floor(filteredMovies.length / pageSize) + 1,
         low = (pageNumber - 1) * pageSize,

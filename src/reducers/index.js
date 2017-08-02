@@ -12,9 +12,19 @@ import {
 
 import {getPreviousLetter, getNextLetter} from '../alphabet';
 
-const movies = ['apple', 'animal', 'anteater', 'anesthesiologist', 'abuse', 'accident', 'accountant', 'baby', 'cat', 'dog', 'door', 'foo', 'elephant', 'monkey', 'tiger', 'goose', 'ferret', 'snake', 'puffin', 'pork', 'zoo', 'japan', 'germany', 'frog', 'fat', 'jello', 'steak', 'pasta', 'whale', 'weather'].map(name => {
-  return {name: name};
-});
+const movies = [{title: 'Apple',
+                 releaseDate: 'May 25, 2006',
+                 tmdbId: '1',
+                 imdbId: 't1'},
+                {title: 'Anesthesiologist',
+                 releaseDate: 'April 2, 1994',
+                 tmdbId: '2',
+                 imdbId: 't2'},
+                {title: 'Abuse',
+                 releaseDate: 'January 31, 1972',
+                 tmdbId: '3',
+                 imdbId: 't3'}];
+
 export const initialState = {letter: 'A',
                              pageNumber: 1,
                              movies: movies,
