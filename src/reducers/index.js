@@ -15,15 +15,18 @@ import {getPreviousLetter, getNextLetter} from '../alphabet';
 const movies = [{title: 'Apple',
                  releaseDate: 'May 25, 2006',
                  tmdbId: '1',
-                 imdbId: 't1'},
+                 imdbId: 't1',
+                 users: []},
                 {title: 'Anesthesiologist',
                  releaseDate: 'April 2, 1994',
                  tmdbId: '2',
-                 imdbId: 't2'},
+                 imdbId: 't2',
+                 users: ['mike']},
                 {title: 'Abuse',
                  releaseDate: 'January 31, 1972',
                  tmdbId: '3',
-                 imdbId: 't3'}];
+                 imdbId: 't3',
+                 users: ['mike', 'abby']}];
 
 export const initialState = {letter: 'A',
                              pageNumber: 1,
