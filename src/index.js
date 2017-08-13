@@ -1,26 +1,17 @@
 import React from 'react';
 import { render } from 'react-dom';
-import { createStore, applyMiddleware } from 'redux';
-import { Provider } from 'react-redux';
-import thunk from 'redux-thunk';
-import { createLogger } from 'redux-logger';
-import reducer from './reducers';
-import App from './components/App';
+import { browserHistory } from 'react-router';
+import { syncHistoryWithStore } from 'react-router-redux';
+import Root from './containers/Root';
+import configureStore from './store/configureStore';
+import {fetchMovies} from './actions';
 
-const middleware = [ thunk ];
-
-if(process.env.NODE_ENV !== 'production') {
-  middleware.push(createLogger());
-};
-
-const store = createStore(
-  reducer,
-  applyMiddleware(...middleware)
-);
+const store = configureStore();
+const history = syncHistoryWithStore(browserHistory, store);
 
 render(
-  <Provider store={store}>
-    <App />
-  </Provider>,
+  <Root store={store} history={history} />,
   document.getElementById('root')
 );
+
+store.dispatch(fetchMovies());

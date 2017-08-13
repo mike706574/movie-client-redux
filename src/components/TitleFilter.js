@@ -1,25 +1,26 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import {changeFilter} from '../actions';
+import {changeTitleFilter} from '../actions';
 
-const Filter = props => {
+const TitleFilter = props => {
   const {dispatch, value} = props;
 
   return (
     <div className='pb-3'>
       <input id='movie-filter-input'
              className='form-control'
+             placeholder='Filter by title'
              type='text'
              value={value}
-             onChange={e => dispatch(changeFilter(e.target.value))} />
+             onChange={e => dispatch(changeTitleFilter(e.target.value))} />
     </div>
   );
 };
 
-Filter.propTypes = {
+TitleFilter.propTypes = {
   dispatch: PropTypes.func.isRequired,
   value: PropTypes.string.isRequired
 };
 
-export default Filter;
+export default TitleFilter;

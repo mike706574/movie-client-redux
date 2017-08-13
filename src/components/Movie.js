@@ -1,44 +1,61 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import {sendUnwatched, sendWatched} from '../actions';
 
 const renameKeys = movie => {
-  return {title: movie.title,
-          users: movie.users,
-          releaseDate: movie['release-date'],
-          tmdbId: movie['tmdb-id'],
-          imdbId: movie['imdb-id']};
+  console.log("HELLO:", movie);
+  return movie;
 };
 
 const UserBadge = props => {
+  const username = props.username,
+        {id, watched} = props.movie,
+        style = {cursor: 'default',
+                 MozUserSelect: 'none',
+                 WebkitUserSelect: 'none',
+                 msUserSelect: 'none'};
+
+  let className = 'fa fa-square-o',
+      action = sendWatched;
+
+  if(watched.includes(username)) {
+    className = 'fa fa-check-square-o';
+    action = sendUnwatched;
+  }
+
   return (
-    <span className='badge badge-default pull-right ml-1'>
-      <i className="fa fa-check-square-o"></i>{'\u00A0'}
-      <i className="fa icon-check-empty"></i>{'\u00A0'}
-      {props.user}
+    <span className='badge badge-default pull-right ml-1'
+          style={style}
+          onClick={e => props.dispatch(action(id, username))}>
+      <i className={className}></i>{'\u00A0'}
+      {username}
     </span>
   );
 };
 
 const UserBadges = props => {
-  if(!props.users || props.users.length === 0) {
-    return null;
-  }
-
   const style = {position: 'absolute', bottom: '1.4em', right: '1em'};
 
-  const items = props.users.map(user => {
-    return <UserBadge user={user} />;
-  });
-
-  return <div style={style}>{items}</div>;
+  return (
+    <div style={style}>
+      <UserBadge username='mike'
+                 movie={props.movie}
+                 dispatch={props.dispatch} />
+      <UserBadge username='abby'
+                 movie={props.movie}
+                 dispatch={props.dispatch} />
+    </div>
+  );
 };
 
 const Movie = props => {
   const {dispatch, movie} = props,
-        {title, releaseDate, tmdbId, imdbId, users} = renameKeys(movie),
-        tmdbUrl = `http://www.imdb.com/title/${tmdbId}`,
-        imdbUrl = `https://www.themoviedb.org/movie/${imdbId}`;
+        {title, description, releaseDate, tmdbId, imdbId} = renameKeys(movie),
+        imdbUrl = `http://www.imdb.com/title/${imdbId}`,
+        tmdbUrl = `https://www.themoviedb.org/movie/${tmdbId}`;
 
+  console.log('MOVIE:');
+  console.log(movie);
   return (
     <div style={{width: '20rem', margin: '0.75rem'}}
          key={movie.title}
@@ -52,10 +69,10 @@ const Movie = props => {
 
         </h4>
         <h6 className='card-subtitle mb-2 text-muted'>{releaseDate}</h6>
-        <p className='card-text'></p>
+        <p className='card-text'>{description}</p>
         <a className='card-link' href={tmdbUrl}>themoviedb</a>
         <a className='card-link' href={imdbUrl}>IMDb</a>
-        <UserBadges users={users} />
+        <UserBadges dispatch={dispatch} movie={movie} />
       </div>
     </div>
   );

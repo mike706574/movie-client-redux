@@ -1,40 +1,45 @@
 import {
+  RECEIVE_MOVIES,
   PREVIOUS_LETTER,
   NEXT_LETTER,
   TO_LETTER,
   PREVIOUS_PAGE,
   NEXT_PAGE,
   TO_PAGE,
-  CHANGE_FILTER,
+  CHANGE_TITLE_FILTER,
+  CHANGE_USER_FILTER,
+  RECEIVE_WATCHED,
+  RECEIVE_UNWATCHED,
   SET_ERROR,
   RESET_ERROR
 } from '../actions';
 
+import merge from 'lodash/merge';
+import {routerReducer as routing} from 'react-router-redux';
+import {combineReducers} from 'redux';
 import {getPreviousLetter, getNextLetter} from '../alphabet';
-
-const movies = [{title: 'Apple',
-                 releaseDate: 'May 25, 2006',
-                 tmdbId: '1',
-                 imdbId: 't1',
-                 users: []},
-                {title: 'Anesthesiologist',
-                 releaseDate: 'April 2, 1994',
-                 tmdbId: '2',
-                 imdbId: 't2',
-                 users: ['mike']},
-                {title: 'Abuse',
-                 releaseDate: 'January 31, 1972',
-                 tmdbId: '3',
-                 imdbId: 't3',
-                 users: ['mike', 'abby']}];
 
 export const initialState = {letter: 'A',
                              pageNumber: 1,
-                             movies: movies,
-                             filterText: '',
+                             fetching: true,
+                             movies: [],
+                             titleFilterText: '',
+                             userFilters: {'mike': 'either',
+                                           'abby': 'either'},
                              error: null};
 
-const rootReducer = (state = initialState, action) => {
+const updateMovie = (movies, id, fn) => {
+  return movies.map(movie => {
+    if(movie.id === id) {
+      return fn(movie);
+    }
+    return movie;
+  });
+};
+
+const app = (state = initialState, action) => {
+  let movies;
+
   switch(action.type) {
   case PREVIOUS_LETTER:
     return {...state, letter: getPreviousLetter(state.letter)};
@@ -43,6 +48,23 @@ const rootReducer = (state = initialState, action) => {
   case TO_LETTER:
     return {...state, letter: action.letter};
 
+  case RECEIVE_MOVIES:
+    return {...state, movies: action.movies, fetching: false};
+
+  case RECEIVE_WATCHED:
+    movies = updateMovie(state.movies, action.movieId, movie => {
+      movie.watched.push(action.username);
+      return movie;
+    });
+    return {...state, movies};
+
+  case RECEIVE_UNWATCHED:
+    movies = updateMovie(state.movies, action.movieId, movie => {
+      movie.watched = movie.watched.filter(username => username !== action.username);
+      return movie;
+    });
+    return {...state, movies: movies};
+
   case PREVIOUS_PAGE:
     return {...state, pageNumber: state.pageNumber - 1};
   case NEXT_PAGE:
@@ -50,16 +72,25 @@ const rootReducer = (state = initialState, action) => {
   case TO_PAGE:
     return {...state, pageNumber: action.page};
 
-  case CHANGE_FILTER:
-    return {...state, filterText: action.value};
+  case CHANGE_TITLE_FILTER:
+    return {...state, titleFilterText: action.value};
+
+  case CHANGE_USER_FILTER:
+    const updatedUserFilter = {};
+    updatedUserFilter[action.user] = action.value;
+    return {...state,
+            userFilters: merge({}, state.userFilters, updatedUserFilter)};
 
   case SET_ERROR:
-    return {...state, error: action.error};
+    return {...state, fetching: false, errorMessage: action.error.message, error: action.error};
   case RESET_ERROR:
     return {...state, error: null};
   default:
     return state;
   }
 };
+
+const rootReducer = combineReducers({app,
+                                     routing});
 
 export default rootReducer;

@@ -7,7 +7,7 @@ const Movies = props => {
   const {dispatch, movies} = props;
 
   const movieItems = movies.map(movie => {
-    return <Movie dispatch={dispatch} movie={movie}></Movie>;
+    return <Movie key={movie.id} dispatch={dispatch} movie={movie}></Movie>;
   });
 
   return (
