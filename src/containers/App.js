@@ -72,8 +72,8 @@ const matchesFilter = (titleFilterText, title) => {
   return true;
 };
 
-const matchesLetter = (letter, title) => {
-  return title.toUpperCase().startsWith(letter);
+const matchesLetter = (letter, movieLetter) => {
+  return letter.toUpperCase() === movieLetter.toUpperCase();
 };
 
 const matchesUserFilter = (movie, username, value) => {
@@ -89,18 +89,25 @@ const matchesUserFilter = (movie, username, value) => {
   }
 }
 
+const getPageCount = (pageSize, items) => {
+  const count = items.length,
+        fullPageCount = (count / pageSize),
+        hasPartialPage = (count % pageSize);
+  return Math.floor(fullPageCount + (hasPartialPage ? 1 : 0));
+};
+
 const mapStateToProps = state => {
   const pageSize = 12,
         {fetching, errorMessage, movies, pageNumber, letter,
          titleFilterText, userFilters} = state.app;
 
   const filteredMovies = movies.filter(movie => {
-          return matchesLetter(letter, movie.title) &&
+          return matchesLetter(letter, movie.letter) &&
             matchesFilter(titleFilterText, movie.title) &&
             matchesUserFilter(movie, 'mike', userFilters.mike) &&
             matchesUserFilter(movie, 'abby', userFilters.abby);
         }),
-        pageCount = Math.floor(filteredMovies.length / pageSize) + 1,
+        pageCount = getPageCount(pageSize, filteredMovies),
         low = (pageNumber - 1) * pageSize,
         high = low + pageSize;
 
@@ -111,7 +118,7 @@ const mapStateToProps = state => {
           fetching,
           errorMessage: errorMessage,
           pageCount: pageCount,
-          movieCount: movies.length,
+          movieCount: filteredMovies.length,
           movies: filteredMovies.slice(low, high)};
 };
 

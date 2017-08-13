@@ -2,13 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {sendUnwatched, sendWatched} from '../actions';
 
-const renameKeys = movie => {
-  console.log("HELLO:", movie);
-  return movie;
-};
-
 const UserBadge = props => {
   const username = props.username,
+        name = props.name,
         {id, watched} = props.movie,
         style = {cursor: 'default',
                  MozUserSelect: 'none',
@@ -28,7 +24,7 @@ const UserBadge = props => {
           style={style}
           onClick={e => props.dispatch(action(id, username))}>
       <i className={className}></i>{'\u00A0'}
-      {username}
+      {name}
     </span>
   );
 };
@@ -38,10 +34,12 @@ const UserBadges = props => {
 
   return (
     <div style={style}>
-      <UserBadge username='mike'
+      <UserBadge name='Mike'
+                 username='mike'
                  movie={props.movie}
                  dispatch={props.dispatch} />
-      <UserBadge username='abby'
+      <UserBadge name='Abby'
+                 username='abby'
                  movie={props.movie}
                  dispatch={props.dispatch} />
     </div>
@@ -50,20 +48,26 @@ const UserBadges = props => {
 
 const Movie = props => {
   const {dispatch, movie} = props,
-        {title, description, releaseDate, tmdbId, imdbId} = renameKeys(movie),
+        title = movie.title,
+        description = movie.description,
+        releaseDate = movie['release-date'],
+        imdbId = movie['imdb-id'],
+        tmdbId = movie['tmdb-id'],
         imdbUrl = `http://www.imdb.com/title/${imdbId}`,
-        tmdbUrl = `https://www.themoviedb.org/movie/${tmdbId}`;
+        tmdbUrl = `https://www.themoviedb.org/movie/${tmdbId}`,
+        backdropPath = movie['backdrop-path'] ?
+          "http://image.tmdb.org/t/p/w300" + movie['backdrop-path'] :
+          "http://via.placeholder.com/300x169";
 
-  console.log('MOVIE:');
-  console.log(movie);
   return (
     <div style={{width: '20rem', margin: '0.75rem'}}
          key={movie.title}
          className='card'>
+
       <img style={{display: 'block', width: '20rem'}}
            className='card-img-top'
            alt={title}
-           src='http://via.placeholder.com/300x169' />
+           src={backdropPath} />
       <div className='card-block'>
         <h4 className='card-title'>{title}{'\u00A0'}{'\u00A0'}
 
